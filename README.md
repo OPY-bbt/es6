@@ -247,11 +247,80 @@ const
 			`foo ${fn()} bar`
 			// foo Hello World bar
 
-		
+正则的扩展
+---------
+	#es5中两种用法
+		## var regex = new RegExp('xyz', 'i'); regex = /xyz/i;
+		## var regex = new RegExp(/xyz/i); regex = /xyz/i;
 
+	#es6中
+	 	## var regex = new RegExp(/abc/ig, 'i')
 
+	#字符串的正则
+		全部绑定到RegExp的实例方法。
 
+	#u修饰符
+		可以正确处理四个字节的UTF-16
 
+	#y修饰符
+		和g类似, 不过y修饰符要确保匹配必须从剩余的第一个位置开始。
+		var s = 'aaa_aa_a';
+		var r1 = /a+/g;
+		var r2 = /a+/y;
+
+		r1.exec(s) // ["aaa"]
+		r1.exec(s) // ["aa"]
+
+		r2.exec(s) // ["aaa"]
+		r2.exec(s) // null
+
+	#flags
+		/abc/ig.source
+		// "abc"
+
+		/abc/ig.flags
+		// 'gi'
+
+正则的扩展
+---------
+	#二进制和八进制表示法
+		二进制 0b（0B）
+		八进制 0o（0O）
+		Number可以将0b和0o前缀的字符串数值转换为十进制。
+
+	#Number.isFinite() Number.isNaN();
+
+	#Number.parseInt() Number.parseFloat()
+
+	#Number.isInteger() 注意25 和 25.0 都会返回true
+
+	#Number.EPSILON 是一个极小的常量 在于为浮点数的计算，设置一个误差范围。
+
+Math对象的扩展
+-----------
+	#Math.trunc() 返回整数部分
+
+	#Math.sign()
+		参数为正数，返回+1；
+		参数为负数，返回-1；
+		参数为0，返回0；
+		参数为-0，返回-0;
+		其他值，返回NaN。
+
+	#Math.cbrt()
+		立方根
+
+	#Math.hypot()
+		返回所有参数的平方和的平方根
+
+	#Math.log10()
+		返回以10为底的x的对数
+
+	#Math.log2()
+		返回以2为底的x的对数
+
+	#指数运算符 **
+		2 ** 3 = 8
 
 
 
