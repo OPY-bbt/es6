@@ -322,16 +322,73 @@ Math对象的扩展
 	#指数运算符 **
 		2 ** 3 = 8
 
+数组的扩展
+-----------
+	#Array.from 
+		将两类对象转为真正的数组。类似数组的对象（array-likeobject）和可遍历（iterable）的对象（包括ES6新增的数据结构Set和Map）。
+
+		实际应用中，常见的类似数组的对象是DOM操作返回的NodeList集合，以及函数内部的arguments对象。Array.from都可以将它们转为真正的数组。
+		// NodeList对象
+		let ps = document.querySelectorAll('p');
+		Array.from(ps).forEach(function (p) {
+		  console.log(p);
+		});
+
+		// arguments对象
+		function foo() {
+		  var args = Array.from(arguments);
+		  // ...
+		}
+
+		Array.from还可以接受第二个参数，作用类似于数组的map方法，用来对每个元素进行处理，将处理后的值放入返回的数组。
+
+		如果map函数里面用到了this关键字，还可以传入Array.from的第三个参数，用来绑定this。
 
 
+	#Array.of()
+		用于将一组值，转换为数组。
 
+	#[].copyWidthin()
+		在当前数组内部，将指定位置的成员复制到其他位置（会覆盖原有成员），然后返回当前数组。也就是说，使用这个方法，会修改当前数组。
 
+		target（必需）：从该位置开始替换数据。
+		start（可选）：从该位置开始读取数据，默认为0。如果为负值，表示倒数。
+		end（可选）：到该位置前停止读取数据，默认等于数组长度。如果为负值，表示倒数。
 
+	#数组实例的find()和findIndex()
+		[1, 4, -5, 10].find((n) => n < 0)
+		// -5
 
+		[1, 5, 10, 15].findIndex(function(value, index, arr) {
+		  return value > 9;
+		}) // 2
 
+	#数组实例的fill()
+		['a', 'b', 'c'].fill(7)
+		// [7, 7, 7]
 
+		['a', 'b', 'c'].fill(7, 1, 2)
+		// ['a', 7, 'c']
 
+	#数组实例的entries()，keys()和values()
+		for (let index of ['a', 'b'].keys()) {
+		  console.log(index);
+		}
+		// 0
+		// 1
 
+		for (let elem of ['a', 'b'].values()) {
+		  console.log(elem);
+		}
+		// 'a'
+		// 'b'
 
+		for (let [index, elem] of ['a', 'b'].entries()) {
+		  console.log(index, elem);
+		}
+		// 0 "a"
+		// 1 "b"
 
+	#数组实例的includes()
+		[1, 2, 3].includes(2);     // true
 
