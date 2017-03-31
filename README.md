@@ -392,3 +392,249 @@ Math对象的扩展
 	#数组实例的includes()
 		[1, 2, 3].includes(2);     // true
 
+
+数组的扩展
+-----------
+	#函数参数的默认值
+		function log(x, y = 'world'){
+			console.log(x,y);
+		}
+
+	#与解构赋值默认值结合使用
+		function fetch(url, { body = '', method = 'GET', headers = {} }) {
+		  console.log(method);
+		}
+
+		fetch('http://example.com', {})
+		// "GET"
+
+		fetch('http://example.com')
+
+	#参数默认值的位置在尾参数
+
+	#应用 利用个参数默认值，可以指定某一个参数不得省略，如果省略就抛出一个错误。
+		function throwIfMissing() {
+		  throw new Error('Missing parameter');
+		}
+
+		function foo(mustBeProvided = throwIfMissing()) {
+		  return mustBeProvided;
+		}
+
+		foo()
+		// Error: Missing parameter
+
+	#rest 参数。
+		function add(...values) {
+			let sum = 0;
+
+			for(let num of values) {
+				sum += val;
+			}
+
+			return sum;
+		}
+
+		add(2,3,5) //10
+
+		// arguments变量的写法
+		function sortNumbers() {
+		  return Array.prototype.slice.call(arguments).sort();
+		}
+
+		// rest参数的写法
+		const sortNumbers = (...numbers) => numbers.sort();
+
+	#扩展运算符
+		##它好比 rest 参数的逆运算，将一个数组转为用逗号分隔的参数序列。
+		
+		##代替数组的apply方法
+			// ES5的写法
+			function f(x, y, z) {
+			  // ...
+			}
+			var args = [0, 1, 2];
+			f.apply(null, args);
+
+			// ES6的写法
+			function f(x, y, z) {
+			  // ...
+			}
+			var args = [0, 1, 2];
+			f(...args);
+
+
+			// ES5的写法
+			Math.max.apply(null, [14, 3, 77])
+
+			// ES6的写法
+			Math.max(...[14, 3, 77])
+
+			// 等同于
+			Math.max(14, 3, 77);
+
+	# 总结： 扩展运算符与rest参数 正好相反 ...后加变量转换为数组 后加数组转换为逗号相隔的参数。
+
+	# 扩展运算符的应用
+		## 合并数组
+			es5 [1,2].concat(more);
+			es6 [1,2,...more];
+
+			var arr1 = [1];
+			var arr2 = [2];
+			var arr3 = [3];
+
+			arr1.concat(arr2,arr3);
+			[...arr1, ...arr2, ...arr3];
+
+		## 与解构赋值结合
+			const [first, ...rest] = [1,2,3,4];
+			rest //[2,3,4];
+
+		##函数的返回值
+			var dateFields = readDateFields(database);
+			var d = new Date(...dateFields);
+
+		##字符串
+			[...'hello']
+			// [ "h", "e", "l", "l", "o" ]
+
+	#name
+		函数的name属性，返回该函数的函数名。
+
+	# =>
+		## 如果箭头函数不需要参数或需要多个参数，就使用一个圆括号代表参数部分。
+		## 如果箭头函数的代码块部分多于一条语句，就要使用大括号将它们括起来，并且使用return语句返回。
+		##由于大括号被解释为代码块，所以如果箭头函数直接返回一个对象，必须在对象外面加上括号。
+			var getTempItem = id => ({ id: id, name: "Temp" });
+		## 注意点
+			1）函数体内的this对象，就是定义时所在的对象，而不是使用时所在的对象。(内部没有this)
+			2）不可以当作构造函数，也就是说，不可以使用new命令，否则会抛出一个错误。
+			3）不可以使用arguments对象，该对象在函数体内不存在。如果要用，可以用Rest参数代替。
+			4）不可以使用yield命令，因此箭头函数不能用作Generator函数。
+
+
+对象的扩展
+-----------
+	#属性的简洁表示法
+		var foo = 'bar';
+		var baz = {foo};
+		baz // {foo: "bar"}
+
+		// 等同于
+		var baz = {foo: foo};
+
+
+		var o = {
+		  method() {
+		    return "Hello!";
+		  }
+		};
+
+		// 等同于
+		var o = {
+		  method: function() {
+		    return "Hello!";
+		  }
+		};
+
+	#属性名表达式
+		let propKey = 'foo';
+
+		let obj = {
+		  [propKey]: true,
+		  ['a' + 'bc']: 123
+		};
+
+	#Object.assign()
+		var target = { a: 1 };
+
+		var source1 = { b: 2 };
+		var source2 = { c: 3 };
+
+		Object.assign(target, source1, source2);
+		target // {a:1, b:2, c:3}
+
+		Object.assign可以用来处理数组，但是会把数组视为对象。
+		Object.assign([1, 2, 3], [4, 5])
+		// [4, 5, 3]
+
+		##用途
+			1）为对象添加属性
+				class Point {
+				  constructor(x, y) {
+				    Object.assign(this, {x, y});
+				  }
+				}
+
+			2）克隆对象
+				function clone(origin) {
+				  return Object.assign({}, origin);
+				}
+
+				克隆继承的值
+				function clone(origin) {
+				  let originProto = Object.getPrototypeOf(origin);
+				  return Object.assign(Object.create(originProto), origin);
+				}
+
+			3）合并多个对象
+				const merge = (target, ...sources) => Object.assign(target, ...sources);
+
+			4）为属性指定默认值
+				const DEFAULTS = {
+				  logLevel: 0,
+				  outputFormat: 'html'
+				};
+
+				function processContent(options) {
+				  options = Object.assign({}, DEFAULTS, options);
+				  console.log(options);
+				  // ...
+				}
+
+	#Object.setPrototypeOf（object, prototype）
+		let proto = {};
+		let obj = { x: 10 };
+		Object.setPrototypeOf(obj, proto);
+
+		proto.y = 20;
+		proto.z = 40;
+
+		obj.x // 10
+		obj.y // 20
+		obj.z // 40
+
+	#Object.getPrototypeOf(obj);
+		function Rectangle() {
+		  // ...
+		}
+
+		var rec = new Rectangle();
+
+		Object.getPrototypeOf(rec) === Rectangle.prototype
+		// true
+
+		Object.setPrototypeOf(rec, Object.prototype);
+		Object.getPrototypeOf(rec) === Rectangle.prototype
+		// false
+
+	#Object.keys（）
+		ES5 引入了Object.keys方法，返回一个数组，成员是参数对象自身的（不含继承的）所有可遍历（enumerable）属性的键名。
+
+		ES2017 引入了跟Object.keys配套的Object.values和Object.entries，供for...of循环使用。
+
+		let {keys, values, entries} = Object;
+		let obj = { a: 1, b: 2, c: 3 };
+
+		for (let key of keys(obj)) {
+		  console.log(key); // 'a', 'b', 'c'
+		}
+
+		for (let value of values(obj)) {
+		  console.log(value); // 1, 2, 3
+		}
+
+		for (let [key, value] of entries(obj)) {
+		  console.log([key, value]); // ['a', 1], ['b', 2], ['c', 3]
+		}
