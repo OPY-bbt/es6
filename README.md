@@ -638,3 +638,327 @@ Math对象的扩展
 		for (let [key, value] of entries(obj)) {
 		  console.log([key, value]); // ['a', 1], ['b', 2], ['c', 3]
 		}
+
+
+Symbol
+-----------
+	#  ES6引入了一种新的原始数据类型Symbol，表示独一无二的值。它是JavaScript语言的第七种数据类型，前六种是：Undefined、Null、布尔值（Boolean）、字符串（String）、数值（Number）、对象（Object）。
+
+	#  作为属性名的Symbol
+
+	#有时，我们希望重新使用同一个Symbol值，Symbol.for方法可以做到这一点。
+
+
+Set & Map
+-----------	
+	#set
+		## ES6 提供了新的数据结构 Set。它类似于数组，但是成员的值都是唯一的，没有重复的值。
+			Set 函数可以接受一个数组（或类似数组的对象）作为参数，用来初始化。
+			数组去重	[...new Set(array)];
+			两个对象总是不相等
+
+		##属性
+			Set.prototype.constructor：构造函数，默认就是Set函数。
+			Set.prototype.size：返回Set实例的成员总数。
+
+			add(value)：添加某个值，返回Set结构本身。
+			delete(value)：删除某个值，返回一个布尔值，表示删除是否成功。
+			has(value)：返回一个布尔值，表示该值是否为Set的成员。
+			clear()：清除所有成员，没有返回值。
+
+			keys()：返回键名的遍历器
+			values()：返回键值的遍历器
+			entries()：返回键值对的遍历器
+			forEach()：使用回调函数遍历每个成员
+
+			let a = new Set([1, 2, 3]);
+			let b = new Set([4, 3, 2]);
+
+			// 并集
+			let union = new Set([...a, ...b]);
+			// Set {1, 2, 3, 4}
+
+			// 交集
+			let intersect = new Set([...a].filter(x => b.has(x)));
+			// set {2, 3}
+
+			// 差集
+			let difference = new Set([...a].filter(x => !b.has(x)));
+			// Set {1}
+
+	#Map
+		## Object结构提供了“字符串—值”的对应，Map结构提供了“值—值”的对应
+
+		##属性
+			size
+
+		##方法
+			set(key, value) 可以链式调用
+			get(key)
+			has(key)
+			delete(key)
+			clear()
+
+			遍历方法
+				keys()：返回键名的遍历器。
+				values()：返回键值的遍历器。
+				entries()：返回所有成员的遍历器。
+				forEach()：遍历Map的所有成员。
+
+				let map = new Map([
+				  [1, 'one'],
+				  [2, 'two'],
+				  [3, 'three'],
+				]);
+
+				[...map.keys()]
+				// [1, 2, 3]
+
+				[...map.values()]
+				// ['one', 'two', 'three']
+
+				[...map.entries()]
+				// [[1,'one'], [2, 'two'], [3, 'three']]
+
+				[...map]
+				// [[1,'one'], [2, 'two'], [3, 'three']]
+
+		##与其他数据结构的相互转换
+			###Map转为数组
+				let myMap = new Map().set(true, 7).set({foo: 3}, ['abc']);
+				[...myMap]
+				// [ [ true, 7 ], [ { foo: 3 }, [ 'abc' ] ] ]
+
+			###数组转为Map
+				new Map([[true, 7], [{foo: 3}, ['abc']]])
+				// Map {true => 7, Object {foo: 3} => ['abc']}
+
+			###Map转为对象
+				如果所有Map的键都是字符串，它可以转为对象。
+				function strMapToObj(strMap) {
+				  let obj = Object.create(null);
+				  for (let [k,v] of strMap) {
+				    obj[k] = v;
+				  }
+				  return obj;
+				}
+
+				let myMap = new Map().set('yes', true).set('no', false);
+				strMapToObj(myMap)
+				// { yes: true, no: false }
+
+			###对象转为Map
+				function objToStrMap(obj) {
+				  let strMap = new Map();
+				  for (let k of Object.keys(obj)) {
+				    strMap.set(k, obj[k]);
+				  }
+				  return strMap;
+				}
+
+				objToStrMap({yes: true, no: false})
+				// [ [ 'yes', true ], [ 'no', false ] ]
+
+Proxy
+-----------
+	var handler = {
+	  get: function(target, name) {
+	    if (name === 'prototype') {
+	      return Object.prototype;
+	    }
+	    return 'Hello, ' + name;
+	  },
+
+	  apply: function(target, thisBinding, args) {
+	    return args[0];
+	  },
+
+	  construct: function(target, args) {
+	    return {value: args[1]};
+	  }
+	};
+
+	var fproxy = new Proxy(function(x, y) {
+	  return x + y;
+	}, handler);
+
+	fproxy(1, 2) // 1
+	new fproxy(1,2) // {value: 2}
+	fproxy.prototype === Object.prototype // true
+	fproxy.foo // "Hello, foo"
+
+
+Reflect
+-----------
+	# 将Object对象的一些明显属于语言内部的方法（比如Object.defineProperty），放到Reflect对象上。
+
+	# 修改某些Object方法的返回结果，让其变得更合理。比如，Object.defineProperty(obj, name, desc)在无法定义属性时，会抛出一个错误，而Reflect.defineProperty(obj, name, desc)则会返回false。
+	
+	# 让Object操作都变成函数行为。某些Object操作是命令式，比如name in obj和delete obj[name]，而Reflect.has(obj, name)和Reflect.deleteProperty(obj, name)让它们变成了函数行为。
+	
+	# Reflect.get(target, name, receiver)
+		var myObject = {
+		  foo: 1,
+		  bar: 2,
+		  get baz() {
+		    return this.foo + this.bar;
+		  },
+		}
+
+		Reflect.get(myObject, 'foo') // 1
+		Reflect.get(myObject, 'bar') // 2
+		Reflect.get(myObject, 'baz') // 3
+
+	# Reflect.set(target, name, value, receiver)
+		var myObject = {
+		  foo: 1,
+		  set bar(value) {
+		    return this.foo = value;
+		  },
+		}
+
+		myObject.foo // 1
+
+		Reflect.set(myObject, 'foo', 2);
+		myObject.foo // 2
+
+		Reflect.set(myObject, 'bar', 3)
+		myObject.foo // 3
+
+	# Reflect.has(obj, name)
+		var myObject = {
+		  foo: 1,
+		};
+
+		// 旧写法
+		'foo' in myObject // true
+
+		// 新写法
+		Reflect.has(myObject, 'foo') // true
+
+	# Reflect.deleteProperty(obj, name) 
+		const myObj = { foo: 'bar' };
+
+		// 旧写法
+		delete myObj.foo;
+
+		// 新写法
+		Reflect.deleteProperty(myObj, 'foo');
+
+	# Reflect.construct(target, args)
+		function Greeting(name) {
+		  this.name = name;
+		}
+
+		// new 的写法
+		const instance = new Greeting('张三');
+
+		// Reflect.construct 的写法
+		const instance = Reflect.construct(Greeting, ['张三']);
+
+	# Reflect.getPrototypeOf(obj)
+		const myObj = new FancyThing();
+
+		// 旧写法
+		Object.getPrototypeOf(myObj) === FancyThing.prototype;
+
+		// 新写法
+		Reflect.getPrototypeOf(myObj) === FancyThing.prototype;
+
+	# Reflect.setPrototypeOf(obj, newProto)
+		const myObj = new FancyThing();
+
+		// 旧写法
+		Object.setPrototypeOf(myObj, OtherThing.prototype);
+
+		// 新写法
+		Reflect.setPrototypeOf(myObj, OtherThing.prototype);
+
+	# Reflect.apply(func, thisArg, args)
+		const ages = [11, 33, 12, 54, 18, 96];
+
+		// 旧写法
+		const youngest = Math.min.apply(Math, ages);
+		const oldest = Math.max.apply(Math, ages);
+		const type = Object.prototype.toString.call(youngest);
+
+		// 新写法
+		const youngest = Reflect.apply(Math.min, Math, ages);
+		const oldest = Reflect.apply(Math.max, Math, ages);
+		const type = Reflect.apply(Object.prototype.toString, youngest, []);
+
+	# Reflect.defineProperty(target, propertyKey, attributes)
+		function MyDate() {
+		  /*…*/
+		}
+
+		// 旧写法
+		Object.defineProperty(MyDate, 'now', {
+		  value: () => new Date.now()
+		});
+
+		// 新写法
+		Reflect.defineProperty(MyDate, 'now', {
+		  value: () => new Date.now()
+		});
+	
+	# Reflect.getOwnPropertyDescriptor(target, propertyKey)
+		var myObject = {};
+		Object.defineProperty(myObject, 'hidden', {
+		  value: true,
+		  enumerable: false,
+		});
+
+		// 旧写法
+		var theDescriptor = Object.getOwnPropertyDescriptor(myObject, 'hidden');
+
+		// 新写法
+		var theDescriptor = Reflect.getOwnPropertyDescriptor(myObject, 'hidden');
+
+	# Reflect.ownKeys (target)
+		var myObject = {
+		  foo: 1,
+		  bar: 2,
+		  [Symbol.for('baz')]: 3,
+		  [Symbol.for('bing')]: 4,
+		};
+
+		// 旧写法
+		Object.getOwnPropertyNames(myObject)
+		// ['foo', 'bar']
+
+		Object.getOwnPropertySymbols(myObject)
+		//[Symbol.for('baz'), Symbol.for('bing')]
+
+		// 新写法
+		Reflect.ownKeys(myObject)
+		// ['foo', 'bar', Symbol.for('baz'), Symbol.for('bing')]
+	
+	# 使用 Proxy 实现观察者模式
+
+		const person = observable({
+		  name: '张三',
+		  age: 20
+		});
+
+		function print() {
+		  console.log(`${person.name}, ${person.age}`)
+		}
+
+		observe(print);
+		person.name = '李四';
+		// 输出
+		// 李四, 20
+
+		实现
+		const queuedObservers = new Set();
+		const observe = fn => queuedObservers.add(fn);
+		const observable = obj => new Proxy(obj, {set});
+
+		function set(target, key, value, receiver) {
+		  const result = Reflect.set(target, key, value, receiver);
+		  queuedObservers.forEach(observer => observer());
+		  return result;
+		}
+
+
